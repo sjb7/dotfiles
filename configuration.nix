@@ -39,6 +39,7 @@
       "opencode"
       "gemini-cli"
       "hermes-agent"
+      "gh"
     ];
     casks = [
       "wezterm"

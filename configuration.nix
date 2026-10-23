@@ -36,10 +36,18 @@
     onActivation.extraFlags = [ "--force" ];
     brews = [
       "herdr"
+      "opencode"
+      "gemini-cli"
+      "hermes-agent"
     ];
     casks = [
       "wezterm"
       "claude-code"
+      "codex"
+      "cursor-cli"
+      "grok-build"
+      "antigravity-cli"
     ];
   };
+  home-manager.backupFileExtension = "backup";
 }

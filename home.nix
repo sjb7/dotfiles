@@ -53,6 +53,14 @@ in
     };
   };
 
+  programs.git = {
+    enable = true;
+    settings.user = {
+      name = "Shubham Jain";
+      email = "sj95.b7@gmail.com";
+    };
+  };
+
   # Edit-in-place: the real file stays in my repo, ~/.config just points at it.
   home.file.".config/wezterm".source =
     config.lib.file.mkOutOfStoreSymlink "${dotfiles}/home/.config/wezterm";

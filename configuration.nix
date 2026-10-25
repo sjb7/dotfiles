@@ -40,6 +40,7 @@
       "gemini-cli"
       "hermes-agent"
       "gh"
+      "questdb"
     ];
     casks = [
       "wezterm"

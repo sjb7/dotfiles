@@ -2,6 +2,23 @@
 
 let
   dotfiles = "${config.home.homeDirectory}/.dotfiles";
+  composio = pkgs.stdenvNoCC.mkDerivation {
+    pname = "composio";
+    version = "0.5.1-beta.500";
+    src = pkgs.fetchurl {
+      url = "https://github.com/ComposioHQ/composio/releases/download/%40composio%2Fcli%400.5.1-beta.500/composio-darwin-aarch64.zip";
+      sha256 = "1aea28ce94dd853e5b8fdc8b264cac33401d06f9236a4b7df232230b23510398";
+    };
+    nativeBuildInputs = [ pkgs.unzip ];
+    sourceRoot = ".";
+    installPhase = ''
+      runHook preInstall
+      mkdir -p $out/bin
+      cp composio-darwin-aarch64/composio $out/bin/composio 2>/dev/null || cp composio $out/bin/composio
+      chmod +x $out/bin/composio
+      runHook postInstall
+    '';
+  };
 in
 
 {
@@ -16,6 +33,8 @@ in
     jq        # json on the command line
     lazygit
     neovim
+    uv        # python package and project manager
+    composio  # composio cli
     # the font everything renders in
     nerd-fonts.hack
   ];

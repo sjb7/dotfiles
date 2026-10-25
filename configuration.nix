@@ -41,6 +41,7 @@
       "hermes-agent"
       "gh"
       "questdb"
+      "mysql"
     ];
     casks = [
       "wezterm"

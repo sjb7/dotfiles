@@ -1,0 +1,3 @@
+interface:
+  display_name: "Ponytail Audit"
+  short_description: "One-shot quality and bloat audit of a whole repository"

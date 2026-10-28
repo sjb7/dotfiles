@@ -1,0 +1,4 @@
+interface:
+  display_name: "Ponytail Review"
+  short_description: "Quality and simplicity review of a code change and its connected code"
+

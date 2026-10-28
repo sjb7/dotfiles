@@ -1,0 +1,3 @@
+interface:
+  display_name: "Triage Labels"
+  short_description: "Canonical triage label roles and their meanings"

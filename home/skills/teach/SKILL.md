@@ -80,7 +80,8 @@ Track every concept taught in the Review Queue of `NOTES.md` (template in sectio
 
 5. Workspace and Fast State Management
 
-Treat the directory where `/teach` runs as the workspace root. Resolve paths relative to it and create directories only when needed.
+Treat the directory where `/teach` runs as the workspace root. Resolve paths relative to it and create directories only when needed. Do not run commands or access anything outside of your workspace.  
+
 
 Maintain:
 - `MISSION.md` — Confirmed learning goal, success criteria, constraints, and scope.
@@ -113,9 +114,13 @@ Notes
 - (the next concept and why it follows)
 ```
 
-6. Visuals, Libraries, and Styling
+6. Visual-first interactive teaching
 
-Visuals must explain concepts, not merely decorate pages. Include a meaningful explanatory diagram when it improves understanding; use clear text when a visual adds no value. Wrap diagrams in <figure> with a <figcaption> explaining what to notice.
+Every lesson must include multiple meaningful visual elements. Scale complexity appropriately; never add filler. Choose visuals suited to the subject: concept maps and system diagrams; flowcharts and state transitions; annotated equations, graphs, and simulations; code execution traces and memory diagrams; or visual analogies for abstract ideas. Use progressive reveals for complex concepts.
+
+Use interactions such as adjustable parameters, clickable diagrams, step-through animations, predictions, experiments, matching, or editable examples. Provide immediate explanatory feedback and reset controls. Every visual and interaction must clarify a concept or test understanding, not merely decorate. Prefer multiple focused visuals over oversized diagrams, and use static visuals when interaction adds no value.
+
+When real-world photographs, illustrations, screenshots, or visual references would improve understanding, search the web for relevant, high-quality images and embed them directly in the HTML lesson. 
 
 Choose the appropriate rendering method:
 

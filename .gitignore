@@ -1,7 +1,10 @@
 # herdr runtime artifacts (regenerated at runtime; never commit)
 home/.config/herdr/*.log
 home/.config/herdr/session.json
+home/.config/herdr/session-snapshots/
 home/.config/herdr/*.sock
+home/.config/herdr/plugins/
+home/.config/herdr/plugins.json
 
 # macOS + nix build noise
 .DS_Store
@@ -11,9 +14,4 @@ result-*
 # Pi credentials and Home Manager adoption backups stay local
 /home/.pi/agent/auth.json
 /home/.pi/agent/**/*.backup
-
-# Pi Calm is a runtime toggle; its local state file is never tracked
-/home/.pi/agent/calm
-
-# no-mistakes local validation state - never commit in this public repo
-.no-mistakes/
+/home/.pi/agent/extensions/orca-*

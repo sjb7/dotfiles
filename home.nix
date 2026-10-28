@@ -1,7 +1,35 @@
-{ config, pkgs, user, ... }:
+{ config, lib, pkgs, user, ... }:
 
 let
   dotfiles = "${config.home.homeDirectory}/.dotfiles";
+  skillsDir = ./home/skills;
+  skillNames =
+    if builtins.pathExists skillsDir
+    then builtins.attrNames (
+      lib.filterAttrs (_: type: type == "directory") (builtins.readDir skillsDir)
+    )
+    else [];
+  agentSkillDirs = [
+    ".agents/skills"
+    ".gemini/config/skills"
+    ".claude/skills"
+    ".codex/skills"
+    ".grok/skills"
+    ".cursor/skills"
+    ".config/opencode/skills"
+    ".pi/agent/skills"
+    ".hermes/skills/custom"
+  ];
+  skillLinks = builtins.listToAttrs (
+    lib.concatMap (skill:
+      map (dir: {
+        name = "${dir}/${skill}";
+        value = {
+          source = config.lib.file.mkOutOfStoreSymlink "${dotfiles}/home/skills/${skill}";
+        };
+      }) agentSkillDirs
+    ) skillNames
+  );
 in
 
 {
@@ -21,6 +49,7 @@ in
   ];
   fonts.fontconfig.enable = true;
   home.sessionVariables.EDITOR = "nvim";
+  home.sessionPath = [ "$HOME/.local/bin" ];
 
   programs.zsh = {
     enable = true;
@@ -62,29 +91,81 @@ in
   };
 
   # Edit-in-place: the real file stays in my repo, ~/.config just points at it.
-  home.file.".config/wezterm".source =
-    config.lib.file.mkOutOfStoreSymlink "${dotfiles}/home/.config/wezterm";
-  home.file.".config/nvim".source =
-    config.lib.file.mkOutOfStoreSymlink "${dotfiles}/home/.config/nvim";
-  home.file.".config/herdr".source =
-    config.lib.file.mkOutOfStoreSymlink "${dotfiles}/home/.config/herdr";
-  home.file.".claude/settings.json".source =
-    config.lib.file.mkOutOfStoreSymlink "${dotfiles}/home/.claude/settings.json";
+  home.file = skillLinks // {
+    ".config/wezterm".source =
+      config.lib.file.mkOutOfStoreSymlink "${dotfiles}/home/.config/wezterm";
+    ".config/nvim".source =
+      config.lib.file.mkOutOfStoreSymlink "${dotfiles}/home/.config/nvim";
+    ".config/herdr".source =
+      config.lib.file.mkOutOfStoreSymlink "${dotfiles}/home/.config/herdr";
+    ".claude/settings.json".source =
+      config.lib.file.mkOutOfStoreSymlink "${dotfiles}/home/.claude/settings.json";
 
-  # Keep Pi's credential and runtime state local by linking only authored files and directories.
-  home.file.".pi/agent/themes".source =
-    config.lib.file.mkOutOfStoreSymlink "${dotfiles}/home/.pi/agent/themes";
-  home.file.".pi/agent/extensions".source =
-    config.lib.file.mkOutOfStoreSymlink "${dotfiles}/home/.pi/agent/extensions";
-  home.file.".pi/agent/models.json".source =
-    config.lib.file.mkOutOfStoreSymlink "${dotfiles}/home/.pi/agent/models.json";
-  home.file.".pi/agent/settings.json".source =
-    config.lib.file.mkOutOfStoreSymlink "${dotfiles}/home/.pi/agent/settings.json";
+    # Keep Pi's credential and runtime state local by linking only authored files and directories.
+    ".pi/agent/themes".source =
+      config.lib.file.mkOutOfStoreSymlink "${dotfiles}/home/.pi/agent/themes";
+    ".pi/agent/extensions".source =
+      config.lib.file.mkOutOfStoreSymlink "${dotfiles}/home/.pi/agent/extensions";
+    ".pi/agent/models.json".source =
+      config.lib.file.mkOutOfStoreSymlink "${dotfiles}/home/.pi/agent/models.json";
+    ".pi/agent/settings.json".source =
+      config.lib.file.mkOutOfStoreSymlink "${dotfiles}/home/.pi/agent/settings.json";
 
-  home.file.".claude/CLAUDE.md".source =
-    config.lib.file.mkOutOfStoreSymlink "${dotfiles}/home/AGENTS.md";
-  home.file.".codex/AGENTS.md".source =
-    config.lib.file.mkOutOfStoreSymlink "${dotfiles}/home/AGENTS.md";
-  home.file.".config/opencode/AGENTS.md".source =
-    config.lib.file.mkOutOfStoreSymlink "${dotfiles}/home/AGENTS.md";
+    ".claude/CLAUDE.md".source =
+      config.lib.file.mkOutOfStoreSymlink "${dotfiles}/home/AGENTS.md";
+    ".codex/AGENTS.md".source =
+      config.lib.file.mkOutOfStoreSymlink "${dotfiles}/home/AGENTS.md";
+    ".config/opencode/AGENTS.md".source =
+      config.lib.file.mkOutOfStoreSymlink "${dotfiles}/home/AGENTS.md";
+
+    ".gemini/statusline.py".source =
+      config.lib.file.mkOutOfStoreSymlink "${dotfiles}/home/statusline.py";
+    ".gemini/antigravity-cli/statusline.py".source =
+      config.lib.file.mkOutOfStoreSymlink "${dotfiles}/home/statusline.py";
+    ".claude/statusline.py".source =
+      config.lib.file.mkOutOfStoreSymlink "${dotfiles}/home/statusline.py";
+    ".grok/statusline.py".source =
+      config.lib.file.mkOutOfStoreSymlink "${dotfiles}/home/statusline.py";
+  };
+
+  home.activation.setupAgentTools = lib.hm.dag.entryAfter [ "writeBoundary" ] ''
+    (
+      export PATH="/opt/homebrew/bin:/usr/local/bin:$HOME/.local/bin:/usr/bin:/bin:/usr/sbin:/sbin:$PATH"
+
+      if ! command -v treehouse >/dev/null 2>&1; then
+        $DRY_RUN_CMD /usr/bin/curl -fsSL https://kunchenguid.github.io/treehouse/install.sh | $DRY_RUN_CMD /bin/sh
+      fi
+
+      if command -v npm >/dev/null 2>&1; then
+        if ! command -v lavish-axi >/dev/null 2>&1; then
+          $DRY_RUN_CMD npm install -g lavish-axi
+        fi
+        $DRY_RUN_CMD lavish-axi setup hooks >/dev/null 2>&1 || true
+        $DRY_RUN_CMD lavish-axi setup plugin >/dev/null 2>&1 || true
+        if [ ! -d "$HOME/.agents/skills/lavish" ]; then
+          $DRY_RUN_CMD npx -y skills add kunchenguid/lavish-axi --skill lavish -g -y >/dev/null 2>&1 || true
+        fi
+      fi
+    )
+  '';
+
+  home.activation.setupHerdrIntegrations = lib.hm.dag.entryAfter [ "writeBoundary" "setupAgentTools" ] ''
+    (
+      export PATH="/opt/homebrew/bin:/usr/local/bin:$HOME/.local/bin:/usr/bin:/bin:/usr/sbin:/sbin:$PATH"
+
+      if command -v herdr >/dev/null 2>&1; then
+        for agent in pi claude codex cursor grok antigravity-cli opencode hermes; do
+          $DRY_RUN_CMD herdr integration install "$agent" >/dev/null 2>&1 || true
+        done
+
+        installed_plugins="$(herdr plugin list 2>/dev/null || true)"
+        for plugin in \
+          "zenbu-labs/terminal-code/herdr-plugin"; do
+          if ! printf '%s\n' "$installed_plugins" | grep -qF "github:$plugin@"; then
+            $DRY_RUN_CMD herdr plugin install --yes "$plugin" >/dev/null 2>&1 || true
+          fi
+        done
+      fi
+    )
+  '';
 }

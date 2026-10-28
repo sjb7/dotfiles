@@ -28,18 +28,43 @@
   nix-homebrew = {
     enable = true;
     inherit user;
+    trust.taps = [
+      "abue-ammar/tinycast"
+      "swiftlysingh/tap"
+      "composiohq/tap"
+    ];
   };
   homebrew = {
     enable = true;
     onActivation.cleanup = "zap";  # remove anything not listed here
     onActivation.autoUpdate = true;
     onActivation.extraFlags = [ "--force" ];
+    taps = [
+      {
+        name = "abue-ammar/tinycast";
+        trusted = true;
+      }
+      {
+        name = "swiftlysingh/tap";
+        trusted = true;
+      }
+      {
+        name = "composiohq/tap";
+        trusted = true;
+      }
+    ];
     brews = [
       "herdr"
       "opencode"
-      "gemini-cli"
       "hermes-agent"
       "gh"
+      "pi-coding-agent"
+      "questdb"
+      "mysql"
+      "mermaid-cli"
+      "swiftlysingh/tap/excalidraw-cli"
+      "agent-browser"
+      "composiohq/tap/composio"
     ];
     casks = [
       "wezterm"
@@ -48,6 +73,9 @@
       "cursor-cli"
       "grok-build"
       "antigravity-cli"
+      "open-design"
+      "handy"
+      "abue-ammar/tinycast/tinycast"
     ];
   };
   home-manager.backupFileExtension = "backup";
